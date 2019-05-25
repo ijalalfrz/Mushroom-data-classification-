@@ -46,6 +46,7 @@ class NBClassification:
         probability_no = []
         y_pred = []
         for i,row in self.test.iterrows():
+            #mencari probabilitias edible dan poison tiap kolom P(X|edible) - P(X|poison)
             for c in self.test.columns[:-1]:                
                 #edible                
                 data_c_yes = self.train[(self.train[c]==row[c]) & (self.train['class']==1)]                
@@ -64,9 +65,10 @@ class NBClassification:
                 #likelihood_no = self.__pdf(self.test[c][i], mean_no, np.sqrt(var_no))
                 probability_no.append(data_c_no.shape[0]/data_no.shape[0])
             
-         
+            #kalikan probabilitas tiap kolom
             p1 = np.prod(probability_yes) * self.p_yes
             p0 = np.prod(probability_no) * self.p_no
+            #jika lebih banyak p1 maka pred akan menghasilkan 1
             pred = 1*(p1>p0)
             y_pred.append(pred)
             probability_yes = []

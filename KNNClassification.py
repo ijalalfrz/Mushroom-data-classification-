@@ -30,17 +30,20 @@ class KNNClassification:
         self.X_train['class'] = self.Y_train
     
     def __getDistance(self,test,train):
+        #mencari jarak data test dengan training menggunakan euclidian distance
         distance = ((test-train)**2).sum()
         return math.sqrt(distance)
     
     def __getNeighbour(self, test):
         distances = []       
+        #mencari data taring dengan jarak terdekat dengan data testing
         self.X_train[:-1].apply(lambda row: distances.append((self.__getDistance(test,row),row['class'])), axis=1)
         
         #for i,row in self.X_train.iterrows():
         #    calcDistance = self.__getDistance(test, row)
         #    distances.append((row, calcDistance, self.Y_train[i]))
         
+        #urutkan berdasarkan jarak
         distances.sort(key = operator.itemgetter(0))
         
         self.neighbours = distances[:self.K]
@@ -48,11 +51,13 @@ class KNNClassification:
     def __voteClass(self):
         c = { "e": 0, "p":0 }
         for i in range(self.K):
+            
             if self.neighbours[i][1] == 1:
                 c['e'] += 1
             else:
                 c['p'] += 1
                 
+        #jika lebih banyak edible                
         if c['e'] > c['p']:
             self.neighbours = []
             return 1
@@ -70,6 +75,7 @@ class KNNClassification:
         #    predicted.append(y_pred)
         #    print(y_pred)
         
+        #prediksi kelas
         self.X_test.apply(self.__doPred, axis=1)
         self.res['predicted'] = np.array(self.predicted)
         self.res['actual'] = self.Y_test
